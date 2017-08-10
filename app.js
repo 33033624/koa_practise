@@ -1,29 +1,22 @@
 const Koa = require('koa')
-const app = new Koa()
 const router = require('koa-router')()
 const bodyParser = require('koa-bodyparser')
-const fs = require('fs')
 const path = require('path')
+const views = require('koa-views')
+const logger = require('koa-logger')
+const routers = require('./router')
+const error = require('koa-onerror')
 
-const files = fs.readdirSync(path.join(__dirname, '/controller'))
-const jsfile = files.filter(item => {
-  return item.endsWith('.js')
-})
-
-jsfile.map(item => {
-  const url = path.join(__dirname, '/controller/', item)
-  let mapping = require(url)
-  var keys = Object.keys(mapping)
-  var values = Object.values(mapping)
-  keys.forEach((item, k) => {
-    if (item.startsWith('GET')) {
-      router.get(item.slice(3), values[k])
-    } else if (item.startsWith('POST')) {
-      router.post(item.slice(4), values[k])
-    } else {
-      console.log('no path')
-    }
-  })
+const app = new Koa()
+error(app)
+app.use(logger())
+router.use(views(path.join(__dirname, '/view'), {map: {html: 'nunjucks'}}))
+router.get('/login', routers.Login.getLogin)
+router.post('/signin', routers.Login.signin)
+router.get('/LoginSuccess', routers.LoginSuccess.LoginSuccess)
+router.get('/LoginFail', routers.LoginFail.LoginFail)
+router.get('*', async (ctx, next) => {
+  ctx.body = '404 err'
 })
 
 app.use(bodyParser())
