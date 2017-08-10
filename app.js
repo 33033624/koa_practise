@@ -5,7 +5,6 @@ const bodyParser = require('koa-bodyparser')
 const fs = require('fs')
 const path = require('path')
 
-
 const files = fs.readdirSync(path.join(__dirname, '/controller'))
 const jsfile = files.filter(item => {
   return item.endsWith('.js')
@@ -29,9 +28,5 @@ jsfile.map(item => {
 
 app.use(bodyParser())
 app.use(router.routes())
-// SSL options
-var options = {
-  key: fs.readFileSync('server.key'),
-  cert: fs.readFileSync('server.crt')
-}
+
 app.listen(3000)
